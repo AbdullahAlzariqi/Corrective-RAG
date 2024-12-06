@@ -2,6 +2,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+from langchain.schema.runnable import RunnableSequence
+
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
@@ -10,7 +12,7 @@ class GradeDocuments(BaseModel):
     binary_score: str = Field(
         description="Documents are relevant to the question, 'yes' or 'no'"
     )
-
+    
 structured_llm_grader = llm.with_structured_output(GradeDocuments)
 
 system = """
@@ -55,4 +57,4 @@ grade_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-retrieval_grader = grade_prompt | structured_llm_grader 
+retrieval_grader:RunnableSequence = grade_prompt | structured_llm_grader 
